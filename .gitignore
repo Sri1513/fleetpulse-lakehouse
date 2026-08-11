@@ -1,0 +1,39 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environment variables and secrets
+.env
+
+# Spark local/temp files
+tmp/
+spark-warehouse/
+metastore_db/
+derby.log
+
+# JAR dependencies copied locally
+jars/
+
+# Logs
+logs/
+*.log
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Data lake/local storage if any exists locally
+data_lake/
+minio_data/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
