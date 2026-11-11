@@ -32,8 +32,52 @@ def create_spark_session(app_name):
         .config("spark.hadoop.fs.s3a.path.style.access", "true")
         .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
         .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+        .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
         .config("spark.driver.extraJavaOptions", f"-Dlog4j.configurationFile={log4j_uri}")
         .config("spark.executor.extraJavaOptions", f"-Dlog4j.configurationFile={log4j_uri}")
+        .getOrCreate()
+    )
+
+
+    spark.sparkContext.setLogLevel("ERROR")
+
+    return spark
+def create_delta_spark_session(app_name):
+    spark = (
+        SparkSession.builder
+        .appName(app_name)
+        .master("local[1]")
+        .config("spark.jars", ",".join(JARS))
+
+        # Delta Lake package
+        .config(
+            "spark.jars.packages",
+            "io.delta:delta-spark_4.1_2.13:4.3.1"
+        )
+
+        # Delta SQL support
+        .config(
+            "spark.sql.extensions",
+            "io.delta.sql.DeltaSparkSessionExtension"
+        )
+        .config(
+            "spark.sql.catalog.spark_catalog",
+            "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+        )
+
+        # Existing MinIO/S3A configs
+        .config("spark.hadoop.fs.s3a.endpoint", MINIO_ENDPOINT)
+        .config("spark.hadoop.fs.s3a.access.key", MINIO_ACCESS_KEY)
+        .config("spark.hadoop.fs.s3a.secret.key", MINIO_SECRET_KEY)
+        .config("spark.hadoop.fs.s3a.path.style.access", "true")
+        .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
+        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+
+        # Logging configs
+        .config("spark.driver.extraJavaOptions", f"-Dlog4j.configurationFile={log4j_uri}")
+        .config("spark.executor.extraJavaOptions", f"-Dlog4j.configurationFile={log4j_uri}")
+
         .getOrCreate()
     )
 
